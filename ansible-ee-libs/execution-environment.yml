@@ -1,0 +1,31 @@
+---
+version: 3
+
+images:
+  base_image:
+    # Needs login
+    name: registry.redhat.io/ansible-automation-platform-24/ee-supported-rhel8:1.0.0-807
+
+dependencies:
+  # galaxy:
+    # collections:
+    #   - beyondtrust.secrets_safe
+    #   - servicenow.servicenow
+    #   - community.general
+  python:
+    - pandas==2.2.3
+    - SQLAlchemy==2.0.37
+
+# additional_build_steps:
+  # prepend:
+  #   - RUN pip3 install --upgrade pip setuptools
+  # prepend_galaxy:
+  #   - ENV ANSIBLE_GALAXY_SERVER_LIST=pah_community,rh_certified
+  #   - ARG ANSIBLE_GALAXY_SERVER_RH_CERTIFIED_TOKEN
+  #   - ARG ANSIBLE_GALAXY_SERVER_PAH_COMMUNITY_TOKEN
+  # append:
+  #   #- RUN pip3 list installed
+  #   - RUN microdnf install which
+
+options:
+  package_manager_path: /usr/bin/microdnf

@@ -25,5 +25,3 @@
     - name: Create new User
       ansible.builtin.include_role:
         name: ginigangadharan.collection_demo_roles_modules.setup_ansible_user
-
-

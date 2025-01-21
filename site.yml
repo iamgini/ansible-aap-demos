@@ -18,17 +18,17 @@
     # - name: Get uptime and details
     #   ansible.builtin.shell: "hostname"
     #   register: output_shell
-    
+
     # - name: Show details
     #   ansible.builtin.debug:
     #     msg: "{{ output_shell }}"
 
     - name: Print the List
-      debug:
+      ansible.builtin.debug:
         msg: "{{ my_list }}"
 
     - name: Concatenate a list to string
-      set_fact:
+      ansible.builtin.set_fact:
         my_string: "{{ my_list | join(',') }}"
 
     - name: Print the String
