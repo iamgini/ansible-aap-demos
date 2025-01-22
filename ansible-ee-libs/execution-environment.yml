@@ -3,12 +3,12 @@ version: 3
 
 images:
   base_image:
-    # Needs login
+    # Needs RH login
     name: registry.redhat.io/ansible-automation-platform-24/ee-supported-rhel8:1.0.0-807
 
 dependencies:
   # galaxy:
-    # collections:
+  #   collections:
     #   - beyondtrust.secrets_safe
     #   - servicenow.servicenow
     #   - community.general
