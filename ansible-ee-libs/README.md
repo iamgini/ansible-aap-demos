@@ -1,0 +1,1 @@
+ansible-builder build -t custom-ee-pah:1.0
