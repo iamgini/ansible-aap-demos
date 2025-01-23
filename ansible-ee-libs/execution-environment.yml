@@ -7,6 +7,10 @@ images:
     name: registry.redhat.io/ansible-automation-platform-24/ee-supported-rhel8:1.0.0-807
 
 dependencies:
+  python_interpreter:
+    python_path: "/usr/bin/python"
+  system:
+    - systemd-devel [platform:rpm]
   # galaxy:
   #   collections:
     #   - beyondtrust.secrets_safe
