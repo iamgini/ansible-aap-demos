@@ -1,5 +1,5 @@
 ARG EE_BASE_IMAGE="registry.redhat.io/ansible-automation-platform-24/ee-supported-rhel8:1.0.0-807"
-ARG PYCMD="/usr/bin/python3"
+ARG PYCMD="/usr/bin/python"
 ARG PKGMGR_PRESERVE_CACHE=""
 ARG ANSIBLE_GALAXY_CLI_COLLECTION_OPTS=""
 ARG ANSIBLE_GALAXY_CLI_ROLE_OPTS=""
@@ -31,7 +31,8 @@ ARG PKGMGR
 
 RUN $PYCMD -m pip install --no-cache-dir bindep pyyaml requirements-parser
 COPY _build/requirements.txt requirements.txt
-RUN $PYCMD /output/scripts/introspect.py introspect --sanitize --user-pip=requirements.txt --write-bindep=/tmp/src/bindep.txt --write-pip=/tmp/src/requirements.txt
+COPY _build/bindep.txt bindep.txt
+RUN $PYCMD /output/scripts/introspect.py introspect --sanitize --user-pip=requirements.txt --user-bindep=bindep.txt --write-bindep=/tmp/src/bindep.txt --write-pip=/tmp/src/requirements.txt
 RUN /output/scripts/assemble
 
 # Final build stage
