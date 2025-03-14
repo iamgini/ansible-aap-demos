@@ -1,0 +1,36 @@
+---
+- name: Demo playbook
+  hosts: localhost
+  collections:
+    - ginigangadharan.network_utilities
+      # version: 0.0.6
+      # source: https://automationhub22-1.lab.local/api/galaxy/content/published/
+  vars:
+    my_list:
+      - "apple"
+      - "mango"
+      - "orange"
+  # collections:
+  #   - ginigangadharan.network_utilities
+  #     source: https://automationhub22-1.lab.local
+
+  tasks:
+    # - name: Get uptime and details
+    #   ansible.builtin.shell: "hostname"
+    #   register: output_shell
+
+    # - name: Show details
+    #   ansible.builtin.debug:
+    #     msg: "{{ output_shell }}"
+
+    - name: Print the List
+      ansible.builtin.debug:
+        msg: "{{ my_list }}"
+
+    - name: Concatenate a list to string
+      ansible.builtin.set_fact:
+        my_string: "{{ my_list | join(',') }}"
+
+    - name: Print the String
+      ansible.builtin.debug:
+        msg: "{{ my_string }}"

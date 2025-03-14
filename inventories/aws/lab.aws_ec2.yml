@@ -1,0 +1,41 @@
+# lab.aws_ec2.yml
+plugin: amazon.aws.aws_ec2
+boto_profile: devops
+regions:
+  - ap-southeast-1
+#  - us-east-1
+#  - us-east-2
+filters:
+  tag:Environment: dev
+  tag:Criticality:
+    - low
+
+# destination_variable = public_dns_name
+# hostname_variable = tag_Name
+hostnames:
+  # - name: 'tag:Name=aws'
+  # - name: 'test_literal' # Using literal values for hostname
+  #   separator: '-'       # Hostname will be aws-test_literal
+  #   prefix: 'aws'
+  # - dns-name
+  - name: 'private-ip-address'
+    separator: '_'
+    prefix: 'tag:Name'
+  # - name: 'private-ip-address'
+  #   separator: '_'
+  #   prefix: 'tag:Name'
+  # name: tag:Name
+  # prefix: aws
+  
+keyed_groups:
+#  # add hosts to tag_Name_value groups for each aws_ec2 host's tags.Name variable
+  - key: tags.Environment
+    prefix: Environment
+#    separator: ""
+#groups:
+#  # add hosts to the group development if any of the dictionary's keys or values is the word 'devel'
+#  development: "'devel' in (tags|list)"
+# compose:
+# #  # set the ansible_host variable to connect with the private IP address without changing the hostname
+#   # ansible_host: private_ip_address
+#   ansible_host: private_ip_address
