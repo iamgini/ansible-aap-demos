@@ -1,0 +1,25 @@
+---
+version: 3
+
+images:
+  base_image:
+    # Needs login
+    name: registry.redhat.io/ansible-automation-platform-24/ee-supported-rhel8:1.0.0-395
+
+dependencies:
+  galaxy: requirements.yml
+  python: requirements.txt
+
+additional_build_steps:
+  # prepend:
+  #   - RUN pip3 install --upgrade pip setuptools
+  prepend_galaxy:
+    - ENV ANSIBLE_GALAXY_SERVER_LIST=pah_community,rh_certified
+    - ARG ANSIBLE_GALAXY_SERVER_RH_CERTIFIED_TOKEN
+    - ARG ANSIBLE_GALAXY_SERVER_PAH_COMMUNITY_TOKEN
+  # append:
+  #   #- RUN pip3 list installed
+  #   - RUN microdnf install which
+
+options:
+  package_manager_path: /usr/bin/microdnf 

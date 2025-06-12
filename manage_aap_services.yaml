@@ -1,0 +1,47 @@
+- name: Manage Containerized AAP 2.5 Services
+  hosts: "{{ target_group }}"  # This will allow us to dynamically target a specific group (e.g., automationgateway, automationeda, etc.)
+  become: false
+  gather_facts: false
+  vars:
+    action: "restart"  # Change this to start, stop, restart, enable, or disable
+  tasks:
+    - name: List active AAP services
+      command: systemctl --user list-units --type=service --no-pager
+      register: service_list
+      changed_when: false
+
+    - name: Perform {{ action }} on AAP services
+      command: systemctl --user {{ action }} automation-{{ item }}* --all
+      loop:
+        - hub
+        - controller
+        - eda
+        - gateway
+      when: action in ["start", "stop", "restart"]
+
+    - name: Enable specific AAP services (Only if action is 'enable')
+      command: systemctl --user enable automation-{{ item }}.service
+      loop:
+        - controller-rsyslog
+        - controller-task
+        - controller-web
+        - eda-activation-worker-1
+        - eda-activation-worker-2
+        - eda-api
+        - eda-daphne
+        - eda-scheduler
+        - eda-web
+        - eda-worker-1
+        - eda-worker-2
+        - gateway-proxy
+        - gateway
+        - hub-api
+        - hub-content
+        - hub-web
+        - hub-worker-1
+        - hub-worker-2
+      when: action == "enable"
+
+    - name: Disable all AAP services (Only if action is 'disable')
+      command: systemctl --user disable `systemctl --user list-units --type=service --all -q --no-pager | awk '$1 ~ /^automation.*$/ { print $1 }'`
+      when: action == "disable"

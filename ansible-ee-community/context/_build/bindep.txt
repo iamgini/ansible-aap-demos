@@ -1,0 +1,14 @@
+gcc
+gcc-c++
+make
+python3-devel
+systemd-devel
+pkgconf-pkg-config
+libffi-devel
+openssl-devel
+krb5-devel
+libselinux-devel
+libyaml-devel
+iputils
+curl
+wget

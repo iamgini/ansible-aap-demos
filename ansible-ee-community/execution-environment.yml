@@ -1,0 +1,73 @@
+---
+version: 3
+
+images:
+  base_image:
+    # Needs RH login
+    name: registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel8:1.0.0-945
+
+dependencies:
+  python_interpreter:
+    python_path: "/usr/bin/python"
+  system:
+    - gcc
+    - gcc-c++
+    - make
+    - python3-devel
+    - systemd-devel
+    - pkgconf-pkg-config
+    - libffi-devel
+    - openssl-devel
+    - krb5-devel
+    - libselinux-devel
+    - libyaml-devel
+    - iputils
+    - curl
+    - wget
+  #   - systemd-devel
+  #   - pkgconf-pkg-config
+  #
+  #   # Development tools (compilers, make)
+  #   # Python development headers (needed for building some Python dependencies)
+  #   - python3-devel
+
+  #   # Common libraries required by community.general modules
+  #   - libffi-devel
+  #   - openssl-devel
+  #   - krb5-devel
+  #   - libselinux-devel
+  #   - libyaml-devel
+
+  #   # Utilities often required by modules in community.general
+  #   - iputils
+  #   - curl
+  #   - wget
+  #   # - pkgconf-pkg-config [platform:rpm]
+  #   # - systemd-devel [platform:rpm]
+  #   # - gcc [platform:rpm]
+  #   # - python3.11-devel [platform:rpm]
+  galaxy:
+    collections:
+      - community.general
+      - ansible.posix
+  # python:
+    # - sh==1.13.1
+    # - jsonschema>=3.2.0,<4.0.1
+    # - textfsm
+    # - ttp
+    # - xmltodict
+    # - dnspython
+# additional_build_steps:
+  # prepend:
+  #   - RUN pip3 install --upgrade pip setuptools
+  # prepend_galaxy:
+  #   - ENV ANSIBLE_GALAXY_SERVER_LIST=pah_community,rh_certified
+  #   - ARG ANSIBLE_GALAXY_SERVER_RH_CERTIFIED_TOKEN
+  #   - ARG ANSIBLE_GALAXY_SERVER_PAH_COMMUNITY_TOKEN
+  # append:
+  #   #- RUN pip3 list installed
+  #   - RUN microdnf install which
+
+options:
+  package_manager_path: /usr/bin/microdnf
+  # user: root
