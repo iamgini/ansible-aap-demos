@@ -18,7 +18,7 @@ Under content:
 ```json
 {
   "extra_vars": {
-    "your_name": "Gineesh",
+    "your_name": "John",
     "env": "dev",
     "nodes": "App-A"
   },
