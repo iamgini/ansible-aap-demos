@@ -19,7 +19,7 @@ collections:
 # from Private Automation Hub
 - name: iamgini.demo_colelction_roles_modules
   version: 1.0.1
-  source: https://aap-rhel-92-1.lab.local:444/api/galaxy/content/community/ 
+  source: https://aap-rhel-92-1.lab.local:444/api/galaxy/content/community/
 ```
 
 ## Ignore SSL Certificate validation
@@ -67,7 +67,25 @@ Alternatively you can keep your `ansible.cfg` outside of the repository (eg: `/h
 
 ### Method 2: Pass the Token as Environment Variable
 
-As well as defining these server options in the ansible.cfg file, you can also define them as environment variables. The environment variable is in the form `ANSIBLE_GALAXY_SERVER_{{ id }}_{{ key }}` where `{{ id }}` is the upper case form of the server identifier and `{{ key }}` is the key to define. 
+You can also define them as environment variables.
+
+The environment variable is in the form `ANSIBLE_GALAXY_SERVER_{{ id }}_TOKEN` where, `{{ id }}` is the upper case form of the server identifier
+
+
+```ini
+[galaxy]
+server_list = pah_community, rh_certified, release_galaxy
+ignore_certs = True
+
+[galaxy_server.pah_community]
+url=https://aap25.lab.iamgini.com/api/galaxy/content/community/
+
+[galaxy_server.rh_certified]
+url=https://aap25.lab.iamgini.com/api/galaxy/content/rh-certified/
+
+[galaxy_server.release_galaxy]
+url=https://galaxy.ansible.com/
+```
 
 For example, for the `rh_certified` in Automation Hub, you can export it as follows.
 
@@ -82,6 +100,12 @@ And for `pah_community` in Automation Hub, you can export it as follows.
 $ export ANSIBLE_GALAXY_SERVER_PAH_COMMUNITY_TOKEN=token_goes_here
 ```
 
+After that, test the access by downloading or installing the collection locally.
+
+```shell
+$ ansible-galaxy collection download ansible.posix
+```
+
 ## Building Execution Environment image
 
 ```shell
@@ -94,7 +118,7 @@ Complete! The build context can be found at: /home/iamgini/ansible/ansible-aap-d
 
 ### Building EEs with environment variables for Galaxy configuration
 
-You can add additional environment variables and arguments as follows. 
+You can add additional environment variables and arguments as follows.
 
 ```yaml
 .
@@ -112,7 +136,7 @@ And you need to pass the same while building the container as follows.
 $ ansible-builder build -f execution-environment-v3.yml \
   -t test:v1 \
   --build-arg ANSIBLE_GALAXY_SERVER_PAH_COMMUNITY_TOKEN \
-  --build-arg ANSIBLE_GALAXY_SERVER_RH_CERTIFIED_TOKEN 
+  --build-arg ANSIBLE_GALAXY_SERVER_RH_CERTIFIED_TOKEN
 ```
 
 **References**
