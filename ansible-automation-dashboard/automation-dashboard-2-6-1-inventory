@@ -1,0 +1,81 @@
+[automationdashboard]
+dashboard.example.org
+
+[automationdashboard:vars]
+# Configure AAP OAuth2 authentication.
+# aap_auth_provider_name - name as shown on the login page.
+aap_auth_provider_name=Ansible Automation Platform
+# aap_auth_provider_protocol - http or https
+aap_auth_provider_protocol=https
+# AAP version - 2.4, 2.5 or 2.6
+aap_auth_provider_aap_version=2.5
+# aap_auth_provider_check_ssl - enforce TLS check or not.
+aap_auth_provider_check_ssl=true
+
+# aap_auth_provider_host - AAP IP or DNS name, with optional port
+# aap_auth_provider_host=
+
+# aap_auth_provider_client_id and aap_auth_provider_client_secret -
+# they are obtained from AAP when OAuth2 application is created in AAP.
+# aap_auth_provider_client_id=
+# aap_auth_provider_client_secret=
+
+# Specify amount of old data to synchronize after installation.
+# The initial_sync_days=N requests N days of old data, counting from "today".
+# The initial_sync_since requests data from the specified data until "today".
+# If both are specified, the initial_sync_since will be used.
+initial_sync_days=1
+# initial_sync_since=2025-08-08
+
+# Hide warnings when insecure https request are made.
+# Use this if your AAP uses self-signed TLS certificate.
+# show_urllib3_insecure_request_warning=False
+
+# Force clean install-like
+# dashboard_update_secret=true
+
+# HTTP/HTTPS settings
+# nginx_disable_https=true
+# Change nginx_http_port or nginx_https_port if you want to access dashboard on a different TCP port.
+# nginx_http_port=8083
+# nginx_https_port=8447
+# TLS certificate configuration
+# The dashboard_tls_cert needs:
+#   - contain server certificate, intermediate CA certificates and root CA certificate.
+#   - the server certificate must be the first one in the file.
+# dashboard_tls_cert=/path/to/tls/dashboard.crt
+# dashboard_tls_key=/path/to/tls/dashboard.key
+
+# Enable Django DEBUG.
+# django_debug=True
+
+[database]
+dashboard.example.org
+
+[all:vars]
+postgresql_admin_username=postgres
+postgresql_admin_password='from_encrypted_var_file'
+# registry_username=
+# registry_password=
+
+# AAP Dashboard - mandatory
+# --------------------------
+dashboard_pg_containerized=True
+dashboard_admin_password='from_encrypted_var_file'
+# The value of dashboard_pg_host needs to resolve to an IP address of the database.
+# It cannot be localhost or 127.0.0.1.
+# It can be IP address of the server.
+dashboard_pg_host=dashboard.example.org
+dashboard_pg_username=aapdashboard
+dashboard_pg_password='from_encrypted_var_file'
+dashboard_pg_database=aapdashboard
+
+bundle_install=false
+#
+# Relevant if bundle_install=false
+# Set container_image_update to True to fetch most recent container images from registry.
+# container_image_update=True
+#
+# Relevant if bundle_install=true
+# <full path to the bundle directory>
+bundle_dir='{{ lookup("ansible.builtin.env", "PWD") }}/bundle'

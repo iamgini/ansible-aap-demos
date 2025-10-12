@@ -104,6 +104,8 @@ After that, test the access by downloading or installing the collection locally.
 
 ```shell
 $ ansible-galaxy collection download ansible.posix
+# To download a single collection at a specific version:
+$ ansible-galaxy collection download my_namespace.my_collection:1.0.0
 ```
 
 ## Building Execution Environment image

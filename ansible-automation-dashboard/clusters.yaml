@@ -1,0 +1,21 @@
+---
+clusters:
+  - protocol: https
+    address: aap.example.org
+    port: 443
+    access_token: <access token from AAP>
+    verify_ssl: false
+    sync_schedules:
+      - name: Every 1 minutes sync
+        rrule: DTSTART;TZID=Europe/Ljubljana:20250630T070000 FREQ=MINUTELY;INTERVAL=1
+        enabled: true
+
+  # - protocol: https
+  #   address: 10.48.17.178
+  #   port: 8443
+  #   access_token: sampleToken1
+  #   verify_ssl: false
+  #   sync_schedules:
+  #     - name: Every 3 hours sync
+  #       rrule: DTSTART;TZID=Europe/Ljubljana:20250630T070000 FREQ=HOURLY;INTERVAL=3
+  #       enabled: true
