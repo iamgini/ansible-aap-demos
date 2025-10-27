@@ -19,6 +19,6 @@ collections:
   source: https://aap-rhel-92-1.lab.local:444/api/galaxy/content/rh-certified/
 
 # from Private Automation Hub
-- name: iamgini.demo_colelction_roles_modules
+- name: iamgini.demo_collection_roles_modules
   version: 1.0.1
-  source: https://aap-rhel-92-1.lab.local:444/api/galaxy/content/community/ 
+  source: https://aap-rhel-92-1.lab.local:444/api/galaxy/content/community/
