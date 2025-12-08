@@ -1,0 +1,32 @@
+apiVersion: aap.ansible.com/v1alpha1
+kind: AnsibleAutomationPlatform
+metadata:
+  name: aap-demo-instance
+  labels:
+    app.kubernetes.io/managed-by: aap-operator
+    app.kubernetes.io/name: aap-demo-instance
+    app.kubernetes.io/operator-version: ''
+    app.kubernetes.io/part-of: aap-demo-instance
+spec:
+  eda:
+    disabled: false
+  route_tls_termination_mechanism: Edge
+  service_type: ClusterIP
+  ingress_type: Route
+  no_log: true
+  redis_mode: standalone
+  hub:
+    disabled: false
+    object_storage_s3_secret: aap-hub-data-secret
+    storage_type: S3
+  api:
+    log_level: INFO
+    replicas: 1
+  database:
+    idle_disabled: false
+    postgres_data_volume_init: false
+    storage_requirements:
+      requests:
+        storage: 100Gi
+  controller:
+    disabled: false

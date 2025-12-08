@@ -1,5 +1,5 @@
-ARG EE_BASE_IMAGE="registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel8:1.0.0-945"
-ARG PYCMD="/usr/bin/python"
+ARG EE_BASE_IMAGE="registry.redhat.io/ansible-automation-platform-26/ee-supported-rhel9:1.0.0-1106"
+ARG PYCMD="/usr/bin/python3"
 ARG PKGMGR_PRESERVE_CACHE=""
 ARG ANSIBLE_GALAXY_CLI_COLLECTION_OPTS=""
 ARG ANSIBLE_GALAXY_CLI_ROLE_OPTS=""
@@ -76,6 +76,9 @@ RUN chmod ug+rw /etc/passwd
 RUN mkdir -p /runner && chgrp 0 /runner && chmod -R ug+rwx /runner
 WORKDIR /runner
 RUN $PYCMD -m pip install --no-cache-dir 'dumb-init==1.2.5'
+RUN microdnf install -y yum-utils
+RUN dnf config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
+RUN dnf install -y terraform
 RUN rm -rf /output
 LABEL ansible-execution-environment=true
 USER 1000
