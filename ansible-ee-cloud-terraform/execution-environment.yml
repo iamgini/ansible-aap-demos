@@ -37,6 +37,11 @@ additional_build_steps:
   #   #- RUN pip3 list installed
   #   - RUN microdnf install which
   append_final:
+    # CA trust
+    - RUN microdnf install -y ca-certificates
+    - COPY otter-ca.cer /etc/pki/ca-trust/source/anchors/otter-ca.cer
+    - RUN update-ca-trust
+    # Other packages
     - RUN microdnf install -y yum-utils
     - RUN dnf config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
     - RUN dnf install -y terraform
