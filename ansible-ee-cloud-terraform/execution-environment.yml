@@ -3,15 +3,16 @@ version: 3
 
 images:
   base_image:
-    # Needs RH login
-    # name: registry.redhat.io/ansible-automation-platform-26/ee-supported-rhel9@sha256:258451a5358e6c3aabde0a0e3fa53695a371e4c5fc910291f029c9c43dda6ce2
     name: registry.redhat.io/ansible-automation-platform-26/ee-supported-rhel9:1.0.0-1106
-    # name: registry.redhat.io/ansible-automation-platform-25/ee-supported-rhel8:1.0.0-945
 
 dependencies:
   # python_interpreter:
   #   python_path: "/usr/bin/python"
   system:
+    - python3-pip [platform:rpm]
+    # - gcc [platform:rpm]
+    - python3-devel [platform:rpm]
+    - libxml2-devel [platform:rpm]
     - pkgconf-pkg-config [platform:rpm]
     - systemd-libs [platform:rpm]
     - systemd-devel [platform:rpm]
@@ -21,12 +22,13 @@ dependencies:
     # - ncurses-compat-libs [platform:rpm]   # libtinfo helper
   galaxy:
     collections:
-      - cloud.terraform
+      # - cloud.terraform
+      - iamgini.terraform
+
   # python:
     # - pandas==2.2.3
-    # - SQLAlchemy==2.0.37
 
-additional_build_steps:
+# additional_build_steps:
   # prepend:
   #   - RUN pip3 install --upgrade pip setuptools
   # prepend_galaxy:
@@ -36,15 +38,16 @@ additional_build_steps:
   # append:
   #   #- RUN pip3 list installed
   #   - RUN microdnf install which
-  append_final:
+  # append_final:
     # CA trust
-    - RUN microdnf install -y ca-certificates
-    - COPY otter-ca.cer /etc/pki/ca-trust/source/anchors/otter-ca.cer
-    - RUN update-ca-trust
+    # - RUN microdnf install -y ca-certificates
+    # - COPY otter-ca.cer /etc/pki/ca-trust/source/anchors/otter-ca.cer
+    # - RUN update-ca-trust
+
     # Other packages
-    - RUN microdnf install -y yum-utils
-    - RUN dnf config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
-    - RUN dnf install -y terraform
+    # - RUN microdnf install -y yum-utils
+    # - RUN dnf config-manager --add-repo https://rpm.releases.hashicorp.com/RHEL/hashicorp.repo
+    # - RUN dnf install -y terraform
 
 options:
   package_manager_path: /usr/bin/microdnf

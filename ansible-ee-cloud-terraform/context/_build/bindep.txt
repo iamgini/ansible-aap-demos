@@ -1,3 +1,6 @@
+python3-pip [platform:rpm]
+python3-devel [platform:rpm]
+libxml2-devel [platform:rpm]
 pkgconf-pkg-config [platform:rpm]
 systemd-libs [platform:rpm]
 systemd-devel [platform:rpm]
