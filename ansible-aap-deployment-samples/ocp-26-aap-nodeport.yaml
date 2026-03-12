@@ -1,0 +1,24 @@
+apiVersion: aap.ansible.com/v1alpha1
+kind: AnsibleAutomationPlatform
+metadata:
+  name: aapdemo
+  namespace: aap
+spec:
+  eda:
+    disabled: true
+  lightspeed:
+    disabled: true
+  route_tls_termination_mechanism: Edge
+  no_log: true
+  redis_mode: standalone
+  hub:
+    disabled: true
+  api:
+    log_level: INFO
+    replicas: 2
+  database:
+    postgres_data_volume_init: false
+    idle_disabled: false
+  service_type: NodePort
+  ingress_type: none
+  hostname: aapdemo.example.com

@@ -2,8 +2,8 @@
 apiVersion: aap.ansible.com/v1alpha1
 kind: AnsibleAutomationPlatform
 metadata:
-  name: example
-  namespace: ansible-automation-platform
+  name:
+  namespace: aap
 spec:
   # Platform
   image_pull_policy: IfNotPresent
