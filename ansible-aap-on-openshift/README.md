@@ -106,6 +106,8 @@ postgres-15-aap-demo-instance-postgres-15-0   Bound    pvc-c8cf391d-5398-447b-9f
 
 ### Using local disk [YET TO COMPLETE TESTING]
 
+*Note: Controller replicas (web and task) cannot be more than 1!*
+
 ```yaml
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
@@ -123,6 +125,14 @@ node/ip-10-0-13-179.us-east-2.compute.internal labeled
 
 $ oc label node ip-10-0-52-51.us-east-2.compute.internal aap-storage=true
 node/ip-10-0-52-51.us-east-2.compute.internal labeled
+```
+
+Create mount directories for PV
+
+```shell
+sudo mkdir -p /mnt/aap-projects
+sudo chmod 777 /mnt/aap-projects
+sudo chown -R 1000:1000 /mnt/aap-projects
 ```
 
 Create PV
@@ -178,4 +188,86 @@ NAME                                                        CAPACITY   ACCESS MO
 persistentvolume/aap-projects-pv                            20Gi       RWO            Delete           Bound    aap/aap-demo-instance-controller-projects-claim   local-path     <unset>                          35s
 persistentvolume/pvc-5a88b285-ea1d-431f-a747-337d44a39df4   1Gi        RWO            Delete           Bound    aap/aap-demo-instance-hub-redis-data              gp3-csi        <unset>                          94m
 persistentvolume/pvc-c8cf391d-5398-447b-9f7a-78387c394670   100Gi      RWO            Delete           Bound    aap/postgres-15-aap-demo-instance-postgres-15-0   gp3-csi        <unset>                          97m
+```
+
+### Using Local Storage Operator [YET TO COMPLETE TESTING]
+
+*Note: Controller replicas (web and task) cannot be more than 1!*
+*Note: if you don't have extra disks, then LSO won't work!*
+
+- Install from Operator Hub (UI)
+
+or
+
+`oc apply -f https://raw.githubusercontent.com/redhat-cop/openshift-local-storage/master/operator.yaml`
+
+Create LocalVolumeSet
+
+```yaml
+apiVersion: local.storage.openshift.io/v1alpha1
+kind: LocalVolumeSet
+metadata:
+  name: localblock
+  namespace: openshift-local-storage
+spec:
+  nodeSelector:
+    nodeSelectorTerms:
+      - matchExpressions:
+          - key: node-role.kubernetes.io/worker
+            operator: Exists
+  storageClassName: localblock-sc
+  volumeMode: Filesystem
+  fsType: xfs
+  deviceInclusionSpec:
+    deviceTypes:
+      - disk
+    minSize: 10Gi
+```
+
+```shell
+$ oc apply -f LocalVolumeSet.yaml
+localvolumeset.local.storage.openshift.io/localblock created
+```
+
+```shell
+$  oc get sc localblock-sc
+NAME            PROVISIONER                    RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+localblock-sc   kubernetes.io/no-provisioner   Delete          WaitForFirstConsumer   false                  32s
+```
+
+Use it in AAP:
+
+```yaml
+apiVersion: aap.ansible.com/v1alpha1
+kind: AnsibleAutomationPlatform
+metadata:
+...
+spec:
+  projects_persistence: true
+  projects_storage_class: localblock-sc
+  projects_storage_access_mode: ReadWriteOnce
+  projects_storage_size: 20Gi
+  web_replicas: 1
+  task_replicas: 1
+```
+
+### Local-Path Provisioner [YET TO COMPLETE TESTING]
+
+```shell
+kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+```
+
+```yaml
+apiVersion: aap.ansible.com/v1alpha1
+kind: AnsibleAutomationPlatform
+metadata:
+...
+  controller:
+    disabled: false
+    projects_persistence: true
+    projects_storage_class: local-path
+    projects_storage_access_mode: ReadWriteOnce
+    projects_storage_size: 20Gi
+    web_replicas: 1
+    task_replicas: 1
 ```

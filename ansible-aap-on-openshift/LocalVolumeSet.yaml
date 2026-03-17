@@ -1,0 +1,18 @@
+apiVersion: local.storage.openshift.io/v1alpha1
+kind: LocalVolumeSet
+metadata:
+  name: localblock
+  namespace: openshift-local-storage
+spec:
+  nodeSelector:
+    nodeSelectorTerms:
+      - matchExpressions:
+          - key: node-role.kubernetes.io/worker
+            operator: Exists
+  storageClassName: localblock-sc
+  volumeMode: Filesystem
+  fsType: xfs
+  deviceInclusionSpec:
+    deviceTypes:
+      - disk
+    minSize: 10Gi
