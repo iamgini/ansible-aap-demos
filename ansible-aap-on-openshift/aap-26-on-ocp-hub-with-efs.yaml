@@ -1,0 +1,35 @@
+apiVersion: aap.ansible.com/v1alpha1
+kind: AnsibleAutomationPlatform
+metadata:
+  name: aap-demo-efs
+  labels:
+    app.kubernetes.io/managed-by: aap-operator
+    app.kubernetes.io/name: aap-demo-efs
+    app.kubernetes.io/operator-version: ''
+    app.kubernetes.io/part-of: aap-demo-efs
+spec:
+  eda:
+    disabled: false
+  route_tls_termination_mechanism: Edge
+  service_type: ClusterIP
+  ingress_type: Route
+  no_log: true
+  redis_mode: standalone
+
+  hub:
+    disabled: false
+    storage_type: file
+    file_storage_storage_class: efs-rwx
+    file_storage_size: 100Gi
+
+  api:
+    log_level: INFO
+    replicas: 1
+  database:
+    idle_disabled: false
+    postgres_data_volume_init: false
+    storage_requirements:
+      requests:
+        storage: 100Gi
+  controller:
+    disabled: false

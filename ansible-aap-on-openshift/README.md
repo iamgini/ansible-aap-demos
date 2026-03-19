@@ -1,5 +1,17 @@
 # AAP on OCP
 
+- [AAP on OCP](#aap-on-ocp)
+  - [Default AAP Operator Resources](#default-aap-operator-resources)
+  - [AAP With Default Setting](#aap-with-default-setting)
+  - [Hub Persistent Storage](#hub-persistent-storage)
+    - [Utilize S3 as backend RWX storage](#utilize-s3-as-backend-rwx-storage)
+    - [Using NFS/EFS as RWX Backend](#using-nfsefs-as-rwx-backend)
+  - [Redis Storage (YET TO TEST)](#redis-storage-yet-to-test)
+  - [Controller Persistent Storage](#controller-persistent-storage)
+    - [Using local disk (YET TO COMPLETE TESTING)](#using-local-disk-yet-to-complete-testing)
+    - [Using Local Storage Operator (YET TO COMPLETE TESTING)](#using-local-storage-operator-yet-to-complete-testing)
+    - [Local-Path Provisioner (YET TO COMPLETE TESTING)](#local-path-provisioner-yet-to-complete-testing)
+
 ## Default AAP Operator Resources
 
 ```shell
@@ -82,6 +94,98 @@ persistentvolumeclaim/aap-demo-instance-hub-redis-data              Bound    pvc
 persistentvolumeclaim/postgres-15-aap-demo-instance-postgres-15-0   Bound    pvc-c8cf391d-5398-447b-9f7a-78387c394670   100Gi      RWO            gp3-csi        <unset>                 11m
 ```
 
+## Hub Persistent Storage
+
+### Utilize S3 as backend RWX storage
+
+- Sample IAM for S3 - [aap-hub-data-access-iam.json](aap-hub-data-access-iam.json)
+- Sample Secret for Storing S3 info - [aap-hub-data-secret.yaml](aap-hub-data-secret.yaml)
+
+
+### Using NFS/EFS as RWX Backend
+
+1. Create EFS (or NFS on EC2) and access point (e.g. `/aap-hub`)
+  - Remember to add proper Security Group entries to allow OCP workder nodes to access EFS mount targets.
+2. Create a dummy StorageClass - [aap-hub-data-on-efs-storageclass.yaml](aap-hub-data-on-efs-storageclass.yaml)
+
+```yaml
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: efs-rwx
+provisioner: kubernetes.io/no-provisioner
+volumeBindingMode: Immediate
+```
+
+```shell
+$ oc apply -f aap-hub-data-on-efs-storageclass.yaml
+storageclass.storage.k8s.io/efs-rwx created
+```
+
+3. Create PV using EFS and dummy StorageClass - [aap-hub-data-on-efs-pv.yaml](aap-hub-data-on-efs-pv.yaml)
+
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: efs-aap-hub-pv
+spec:
+  capacity:
+    storage: 100Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: efs-rwx
+  nfs:
+    server: 192.168.0.175
+    path: /aap-hub
+```
+
+```shell
+$ oc apply -f aap-hub-data-on-efs-pv.yaml
+persistentvolume/efs-aap-hub-pv created
+```
+
+```shell
+$ oc get pv,pvc
+NAME                              CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS     CLAIM                               STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+persistentvolume/efs-aap-hub-pv   100Gi      RWX            Retain           Released   aap/aap-demo-efs-hub-file-storage   efs-rwx        <unset>                          11m
+```
+
+4. Mention the Hub storage in AAP CRD with dummy StorageClass
+
+Sample: [aap-26-on-ocp-hub-with-efs.yaml](aap-26-on-ocp-hub-with-efs.yaml)
+
+```yaml
+apiVersion: aap.ansible.com/v1alpha1
+kind: AnsibleAutomationPlatform
+spec:
+...
+  hub:
+    disabled: false
+    storage_type: file
+    file_storage_storage_class: efs-rwx
+    file_storage_size: 100Gi
+```
+
+1. Validate PV and PVC
+
+```shell
+$ oc get pv,pvc
+NAME                                                        CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                                        STORAGECLASS   VOLUMEATTRIBUTESCLASS   REASON   AGE
+persistentvolume/efs-aap-hub-pv                             100Gi      RWX            Retain           Bound    aap/aap-demo-efs-hub-file-storage            efs-rwx        <unset>                          3m37s
+persistentvolume/pvc-784d6b76-931f-47df-bd79-489735e9100e   100Gi      RWO            Delete           Bound    aap/postgres-15-aap-demo-efs-postgres-15-0   gp3-csi        <unset>                          11m
+persistentvolume/pvc-b131b9aa-fee8-4825-b0e3-79b1bd050c45   1Gi        RWO            Delete           Bound    aap/aap-demo-efs-hub-redis-data              gp3-csi        <unset>                          8m54s
+
+NAME                                                           STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+persistentvolumeclaim/aap-demo-efs-hub-file-storage            Bound    efs-aap-hub-pv                             100Gi      RWX            efs-rwx        <unset>                 8m52s
+persistentvolumeclaim/aap-demo-efs-hub-redis-data              Bound    pvc-b131b9aa-fee8-4825-b0e3-79b1bd050c45   1Gi        RWO            gp3-csi        <unset>                 8m59s
+persistentvolumeclaim/postgres-15-aap-demo-efs-postgres-15-0   Bound    pvc-784d6b76-931f-47df-bd79-489735e9100e   100Gi      RWO            gp3-csi        <unset>                 11m
+```
+
+## Redis Storage (YET TO TEST)
+
+
 ## Controller Persistent Storage
 
 ```yaml
@@ -104,7 +208,7 @@ aap-demo-instance-hub-redis-data              Bound    pvc-5a88b285-ea1d-431f-a7
 postgres-15-aap-demo-instance-postgres-15-0   Bound    pvc-c8cf391d-5398-447b-9f7a-78387c394670   100Gi      RWO            gp3-csi        <unset>                 65m
 ```
 
-### Using local disk [YET TO COMPLETE TESTING]
+### Using local disk (YET TO COMPLETE TESTING)
 
 *Note: Controller replicas (web and task) cannot be more than 1!*
 
@@ -190,7 +294,7 @@ persistentvolume/pvc-5a88b285-ea1d-431f-a747-337d44a39df4   1Gi        RWO      
 persistentvolume/pvc-c8cf391d-5398-447b-9f7a-78387c394670   100Gi      RWO            Delete           Bound    aap/postgres-15-aap-demo-instance-postgres-15-0   gp3-csi        <unset>                          97m
 ```
 
-### Using Local Storage Operator [YET TO COMPLETE TESTING]
+### Using Local Storage Operator (YET TO COMPLETE TESTING)
 
 *Note: Controller replicas (web and task) cannot be more than 1!*
 *Note: if you don't have extra disks, then LSO won't work!*
@@ -251,7 +355,7 @@ spec:
   task_replicas: 1
 ```
 
-### Local-Path Provisioner [YET TO COMPLETE TESTING]
+### Local-Path Provisioner (YET TO COMPLETE TESTING)
 
 ```shell
 kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
