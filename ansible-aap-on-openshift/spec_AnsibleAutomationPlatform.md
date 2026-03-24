@@ -1,0 +1,156 @@
+# AnsibleAutomationPlatform.spec
+
+```shell
+$  oc explain AnsibleAutomationPlatform.spec
+KIND:     AnsibleAutomationPlatform
+VERSION:  aap.ansible.com/v1alpha1
+
+RESOURCE: spec <Object>
+
+DESCRIPTION:
+     Spec defines the desired state of AnsibleAutomationPlatform
+
+FIELDS:
+   admin_password_secret        <string>
+     Secret where the admin password can be found
+
+   api  <Object>
+     The gateway api deployment.
+
+   bundle_cacert_secret <string>
+     Secret where the trusted Certificate Authority Bundle is stored
+
+   controller   <>
+     Controller defines the desired state of AutomationController
+
+   database     <Object>
+     The Gateway PostgreSQL database StatefulSet
+
+   db_fields_encryption_secret  <string>
+     Secret where the DB fields encryption key can be found. If not specified,
+     one will be generated.
+
+   eda  <>
+     EDA defines the desired state of EDA
+
+   extra_settings       <[]Object>
+     Environment variables to configure the application-level settings
+
+   feature_flags        <map[string]boolean>
+     Platform Feature Flags Dictionary
+
+   hostname     <string>
+     Override default hostname of the Ansible Automation Platform
+
+   hub  <>
+     Hub defines the desired state of AutomationHub
+
+   idle_aap     <boolean>
+     Scale down replicas to put AAP into an idle mode
+
+   image        <string>
+     AAP Gateway container image
+
+   image_proxy  <string>
+     AAP Gateway Proxy container image
+
+   image_proxy_version  <string>
+     AAP Gateway Proxy container image version (tag)
+
+   image_pull_policy    <string>
+     The image pull policy
+
+   image_pull_secrets   <[]string>
+     Image pull secrets for app and database containers
+
+   image_version        <string>
+     AAP Gateway container image version (tag)
+
+   ingress_annotations  <string>
+     Annotations to add to the Ingress Controller
+
+   ingress_api_version  <string>
+     The Ingress API version to use
+
+   ingress_class_name   <string>
+     The name of ingress class to use instead of the cluster default.
+
+   ingress_path <string>
+     The ingress path used to reach the deployed service
+
+   ingress_path_type    <string>
+     The ingress path type for the deployed service
+
+   ingress_tls_secret   <string>
+     Secret where the Ingress TLS secret can be found
+
+   ingress_type <string>
+     The ingress type to use to reach the deployed instance
+
+   lightspeed   <>
+     Lightspeed defines the desired state of AnsibleLightspeed
+
+   loadbalancer_port    <integer>
+     Port to use for the loadbalancer
+
+   loadbalancer_protocol        <string>
+     Protocol to use for the loadbalancer
+
+   mcp  <>
+     MCP defines the desired state of the Ansible MCP Server
+
+   no_log       <boolean>
+     Configure no_log for no_log tasks
+
+   postgres_image       <string>
+     Registry path to the PostgreSQL container to use
+
+   postgres_image_version       <string>
+     PostgreSQL container image version to use
+
+   public_base_url      <string>
+     Public base URL for AAP
+
+   redhat_registry      <string>
+     Default Redhat Container Image Registry
+
+   redhat_registry_ns   <string>
+     Default Redhat Container Image Registry Namespace
+
+   redis        <Object>
+     Defines desired state of cache resources
+
+   redis_image  <string>
+     Registry path to the redis container to use
+
+   redis_image_version  <string>
+     Redis container image version to use
+
+   redis_mode   <string>
+     Redis Mode
+
+   route_annotations    <string>
+     Annotations to add to the route
+
+   route_api_version    <string>
+     The route API version to use
+
+   route_host   <string>
+     The DNS to use to points to the instance
+
+   route_tls_secret     <string>
+     Secret where the TLS related credentials are stored
+
+   route_tls_termination_mechanism      <string>
+     The secure TLS termination mechanism to use
+
+   service_account_annotations  <string>
+     ServiceAccount annotations
+
+   service_annotations  <string>
+     Annotations to add to the load balancer service
+
+   service_type <string>
+     The service type to be used on the deployed instance
+
+```
