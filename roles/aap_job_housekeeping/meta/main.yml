@@ -1,0 +1,7 @@
+---
+galaxy_info:
+  role_name: aap_job_housekeeping
+  author: your_name
+  description: Cleans up AAP job history beyond retention period via API batched deletes
+  min_ansible_version: "2.14"
+dependencies: []

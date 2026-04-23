@@ -1,0 +1,41 @@
+---
+- name: Gather date/time facts
+  ansible.builtin.setup:
+    gather_subset:
+      - date_time
+
+- name: Set shared facts
+  ansible.builtin.set_fact:
+    _cutoff_iso: >-
+      {{ '%Y-%m-%dT%H:%M:%SZ' | strftime((ansible_date_time.epoch | int) - (retention_days | int * 86400)) }}
+    _api_headers:
+      Authorization: "Bearer {{ aap_token }}"
+      Content-Type: "application/json"
+    _total_deleted: 0
+    batch_remaining: -1   # -1 = not yet checked; enter loop unconditionally
+
+- name: Show cleanup parameters
+  ansible.builtin.debug:
+    msg:
+      - "AAP host    : {{ aap_host }}"
+      - "Cutoff date : {{ _cutoff_iso }}"
+      - "Batch size  : {{ batch_size }}"
+      - "Retention   : {{ retention_days }} days"
+
+# Loop: include delete_batch, re-evaluate batch_remaining after each run.
+# Stops when the API reports count == 0 (nothing left beyond cutoff).
+- name: Clean up all jobs beyond retention in batches
+  ansible.builtin.include_tasks: delete_batch.yml
+  vars:
+    _loop_index: "{{ _loop_index_val }}"
+  loop: "{{ range(0, 10000) | list }}"   # hard ceiling — safety valve
+  loop_control:
+    loop_var: _loop_index_val
+    label: "batch {{ _loop_index_val + 1 }}"
+  when: batch_remaining | int != 0       # exits once API returns count=0
+
+- name: Final summary
+  ansible.builtin.debug:
+    msg:
+      - "Total jobs deleted this run : {{ _total_deleted }}"
+      - "Jobs remaining beyond cutoff: {{ batch_remaining }}"

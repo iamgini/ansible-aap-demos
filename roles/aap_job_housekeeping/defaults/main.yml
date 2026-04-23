@@ -1,0 +1,8 @@
+---
+aap_host: "https://aap.example.com"
+aap_token: ""
+retention_days: 30
+batch_size: 100
+async_timeout: 60
+async_poll_interval: 5
+validate_certs: true

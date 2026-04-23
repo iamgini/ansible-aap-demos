@@ -1,0 +1,12 @@
+---
+- name: AAP Job Housekeeping
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  roles:
+    - role: aap_job_housekeeping
+      vars:
+        aap_host: "{{ lookup('env', 'AAP_HOST') }}"
+        aap_token: "{{ lookup('env', 'AAP_TOKEN') }}"
+        retention_days: 30
+        batch_size: 100

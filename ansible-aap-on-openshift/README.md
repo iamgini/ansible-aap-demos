@@ -6,6 +6,7 @@
   - [Hub Persistent Storage](#hub-persistent-storage)
     - [Utilize S3 as backend RWX storage](#utilize-s3-as-backend-rwx-storage)
     - [Using NFS/EFS as RWX Backend](#using-nfsefs-as-rwx-backend)
+  - [Automation hub - Redis without PV](#automation-hub---redis-without-pv)
   - [Redis Storage (YET TO TEST)](#redis-storage-yet-to-test)
   - [Controller Persistent Storage](#controller-persistent-storage)
     - [Using local disk (YET TO COMPLETE TESTING)](#using-local-disk-yet-to-complete-testing)
@@ -182,6 +183,44 @@ NAME                                                           STATUS   VOLUME  
 persistentvolumeclaim/aap-demo-efs-hub-file-storage            Bound    efs-aap-hub-pv                             100Gi      RWX            efs-rwx        <unset>                 8m52s
 persistentvolumeclaim/aap-demo-efs-hub-redis-data              Bound    pvc-b131b9aa-fee8-4825-b0e3-79b1bd050c45   1Gi        RWO            gp3-csi        <unset>                 8m59s
 persistentvolumeclaim/postgres-15-aap-demo-efs-postgres-15-0   Bound    pvc-784d6b76-931f-47df-bd79-489735e9100e   100Gi      RWO            gp3-csi        <unset>                 11m
+```
+
+## Automation hub - Redis without PV
+
+```yaml
+apiVersion: aap.ansible.com/v1alpha1
+kind: AnsibleAutomationPlatform
+metadata:
+  name: aap-demo-instance
+  labels:
+    app.kubernetes.io/managed-by: aap-operator
+    app.kubernetes.io/name: aap-demo-instance
+    app.kubernetes.io/operator-version: ''
+    app.kubernetes.io/part-of: aap-demo-instance
+spec:
+  eda:
+    disabled: true
+  route_tls_termination_mechanism: Edge
+  service_type: ClusterIP
+  ingress_type: Route
+  no_log: true
+  redis_mode: standalone
+  hub:
+    disabled: false
+    # object_storage_s3_secret: aap-hub-data-secret
+    # storage_type: S3
+    redis_data_persistence: false
+  api:
+    log_level: INFO
+    replicas: 1
+  database:
+    idle_disabled: false
+    postgres_data_volume_init: false
+    storage_requirements:
+      requests:
+        storage: 100Gi
+  controller:
+    disabled: false
 ```
 
 ## Redis Storage (YET TO TEST)

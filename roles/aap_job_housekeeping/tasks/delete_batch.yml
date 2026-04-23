@@ -1,0 +1,56 @@
+---
+# Fetches one batch of oldest jobs beyond retention and deletes async.
+# Sets `batch_remaining` so the caller knows whether to keep looping.
+
+- name: Fetch oldest {{ batch_size }} jobs beyond retention cutoff
+  ansible.builtin.uri:
+    url: >-
+      {{ aap_host }}/api/v2/jobs/?order_by=finished
+      &status__in=successful,failed,error,canceled
+      &finished__lt={{ _cutoff_iso }}
+      &page_size={{ batch_size }}
+    method: GET
+    headers: "{{ _api_headers }}"
+    validate_certs: "{{ validate_certs }}"
+    status_code: 200
+  register: _jobs_response
+
+- name: Set batch facts
+  ansible.builtin.set_fact:
+    _jobs_to_delete: "{{ _jobs_response.json.results | default([]) }}"
+    batch_remaining: "{{ _jobs_response.json.count | default(0) | int }}"
+
+- name: Show batch info
+  ansible.builtin.debug:
+    msg: "Batch: {{ _jobs_to_delete | length }} to delete now — {{ batch_remaining }} total remaining beyond cutoff"
+
+- name: Fire DELETE requests async
+  ansible.builtin.uri:
+    url: "{{ aap_host }}/api/v2/jobs/{{ item.id }}/"
+    method: DELETE
+    headers: "{{ _api_headers }}"
+    validate_certs: "{{ validate_certs }}"
+    status_code: [204, 404]
+  loop: "{{ _jobs_to_delete }}"
+  loop_control:
+    label: "job_id={{ item.id }} finished={{ item.finished }}"
+  async: "{{ async_timeout }}"
+  poll: 0
+  register: _delete_async
+  when: _jobs_to_delete | length > 0
+
+- name: Wait for all deletes to complete
+  ansible.builtin.async_status:
+    jid: "{{ item.ansible_job_id }}"
+  loop: "{{ _delete_async.results | default([]) }}"
+  loop_control:
+    label: "job_id={{ item.item.id }}"
+  register: _async_results
+  until: _async_results.finished
+  retries: "{{ (async_timeout / async_poll_interval) | int }}"
+  delay: "{{ async_poll_interval }}"
+  when: _jobs_to_delete | length > 0
+
+- name: Accumulate deleted count
+  ansible.builtin.set_fact:
+    _total_deleted: "{{ (_total_deleted | default(0) | int) + (_jobs_to_delete | length | int) }}"
