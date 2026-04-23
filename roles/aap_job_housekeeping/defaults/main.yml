@@ -1,6 +1,11 @@
 ---
 aap_host: "https://aap.example.com"
+
+# Auth - set one of the two methods
 aap_token: ""
+aap_username: ""
+aap_password: ""
+
 retention_days: 30
 batch_size: 100
 async_timeout: 60

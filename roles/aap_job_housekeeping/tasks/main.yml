@@ -4,15 +4,32 @@
     gather_subset:
       - date_time
 
-- name: Set shared facts
+- name: Validate auth input
+  ansible.builtin.assert:
+    that:
+      - aap_token | length > 0 or (aap_username | length > 0 and aap_password | length > 0)
+    fail_msg: "Provide either aap_token or both aap_username and aap_password"
+
+- name: Set auth header (token)
   ansible.builtin.set_fact:
-    _cutoff_iso: >-
-      {{ '%Y-%m-%dT%H:%M:%SZ' | strftime((ansible_date_time.epoch | int) - (retention_days | int * 86400)) }}
     _api_headers:
       Authorization: "Bearer {{ aap_token }}"
       Content-Type: "application/json"
+  when: aap_token | length > 0
+
+- name: Set auth header (basic)
+  ansible.builtin.set_fact:
+    _api_headers:
+      Authorization: "Basic {{ (aap_username ~ ':' ~ aap_password) | b64encode }}"
+      Content-Type: "application/json"
+  when: aap_token | length == 0
+
+- name: Set remaining shared facts
+  ansible.builtin.set_fact:
+    _cutoff_iso: >-
+      {{ '%Y-%m-%dT%H:%M:%SZ' | strftime((ansible_date_time.epoch | int) - (retention_days | int * 86400)) }}
     _total_deleted: 0
-    batch_remaining: -1   # -1 = not yet checked; enter loop unconditionally
+    batch_remaining: -1
 
 - name: Show cleanup parameters
   ansible.builtin.debug:

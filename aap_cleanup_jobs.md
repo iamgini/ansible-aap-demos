@@ -4,7 +4,7 @@ Usage:
 
 
 ```shell
-ansible-playbook cleanup_aap_jobs.yml \
+$ ansible-playbook aap_cleanup_aap_jobs.yml \
     -e "aap_host=https://aap.example.com" \
     -e "aap_token=<your_token>" \
     -e "retention_days=30" \
