@@ -87,6 +87,22 @@ url=https://aap25.lab.iamgini.com/api/galaxy/content/rh-certified/
 url=https://galaxy.ansible.com/
 ```
 
+Another sample:
+
+```ini
+[galaxy]
+server_list = rh_published, rh_validated
+ignore_certs = True
+
+[galaxy_server.rh_published]
+url=https://console.redhat.com/api/automation-hub/content/published/
+auth_url=https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
+
+[galaxy_server.rh_validated]
+url=https://console.redhat.com/api/automation-hub/content/validated/
+auth_url=https://sso.redhat.com/auth/realms/redhat-external/protocol/openid-connect/token
+```
+
 For example, for the `rh_certified` in Automation Hub, you can export it as follows.
 
 ```shell
