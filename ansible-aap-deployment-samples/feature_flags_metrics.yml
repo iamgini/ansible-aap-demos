@@ -1,0 +1,3 @@
+---
+feature_flags:
+  FEATURE_DASHBOARD_COLLECTION_ENABLED: True
